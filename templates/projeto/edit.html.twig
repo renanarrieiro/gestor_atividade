@@ -1,0 +1,16 @@
+﻿{% extends 'base.html.twig' %}
+
+{% block title %}Editar Projeto{% endblock %}
+
+{% block body %}
+<h1 class="page-title">Editar Projeto {{ projeto.nome }}</h1>
+<div class="card">
+    {{ form_start(form) }}
+    {{ form_row(form.nome) }}
+    <div class="actions">
+        <button class="btn">Salvar Alterações</button>
+        <a class="btn secondary" href="{{ path('app_projeto_show', {id: projeto.id}) }}">Cancelar</a>
+    </div>
+    {{ form_end(form) }}
+</div>
+{% endblock %}

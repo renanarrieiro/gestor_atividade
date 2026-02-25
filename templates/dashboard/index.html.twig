@@ -1,0 +1,51 @@
+﻿{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard | Gestor de Atividades{% endblock %}
+
+{% block body %}
+<h1 class="page-title">Painel de Atividade</h1>
+<div class="activity-sections">
+    <div class="grid-3">
+        <div class="card">
+            <div class="stat">{{ projetos|length }}</div>
+            <div class="subtle">Projetos cadastrados</div>
+        </div>
+        <div class="card">
+            <div class="stat">{{ requestsRecentes|length }}</div>
+            <div class="subtle">Requests recentes</div>
+        </div>
+        <div class="card">
+            <div class="subtle">Ações rápidas</div>
+            <div class="actions">
+                <a class="btn" href="{{ path('app_projeto_new') }}">Novo Projeto</a>
+                <a class="btn secondary" href="{{ path('app_request_index') }}">Ver Requests</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2 class="section-title">Projetos</h2>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>Nome</th><th>Atividades</th><th>Ações</th></tr></thead>
+                <tbody>
+                {% for projeto in projetos %}
+                    <tr>
+                        <td>{{ projeto.nome }}</td>
+                        <td>{{ projeto.atividades|length }}</td>
+                        <td>
+                            <a class="btn secondary icon-btn" title="Abrir" aria-label="Abrir" href="{{ path('app_projeto_show', {id: projeto.id}) }}">
+                                <svg class="icon" aria-hidden="true"><use href="#icon-open"></use></svg>
+                                <span class="sr-only">Abrir</span>
+                            </a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="3">Nenhum projeto cadastrado.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

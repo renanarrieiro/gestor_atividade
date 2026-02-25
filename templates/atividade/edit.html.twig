@@ -1,0 +1,19 @@
+﻿{% extends 'base.html.twig' %}
+
+{% block title %}Editar Atividade{% endblock %}
+
+{% block body %}
+<h1 class="page-title">Editar Atividade {{ atividade.idExterno }}</h1>
+<div class="card">
+    {{ form_start(form) }}
+    <div class="grid-2">
+        <div>{{ form_row(form.idExterno) }}</div>
+        <div>{{ form_row(form.descricao) }}</div>
+    </div>
+    <div class="actions">
+        <button class="btn">Salvar Alterações</button>
+        <a class="btn secondary" href="{{ path('app_atividade_show', {id: atividade.id}) }}">Cancelar</a>
+    </div>
+    {{ form_end(form) }}
+</div>
+{% endblock %}

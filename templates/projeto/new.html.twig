@@ -1,0 +1,16 @@
+﻿{% extends 'base.html.twig' %}
+
+{% block title %}Novo Projeto{% endblock %}
+
+{% block body %}
+<h1 class="page-title">Novo Projeto</h1>
+<div class="card">
+    {{ form_start(form) }}
+    {{ form_row(form.nome) }}
+    <div class="actions">
+        <button class="btn">Salvar</button>
+        <a class="btn secondary" href="{{ path('app_projeto_index') }}">Cancelar</a>
+    </div>
+    {{ form_end(form) }}
+</div>
+{% endblock %}

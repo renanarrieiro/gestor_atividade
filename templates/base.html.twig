@@ -1,0 +1,165 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Gestor de Atividades SAP{% endblock %}</title>
+    <link rel="stylesheet" href="/styles/app.css">
+</head>
+<body>
+<header class="shell-header">
+    <div class="shell-brand">Gestor de Atividades</div>
+    <nav class="shell-nav">
+        <a href="{{ path('app_dashboard') }}">Dashboard</a>
+        <a href="{{ path('app_projeto_index') }}">Projetos</a>
+        <a href="{{ path('app_request_index') }}">Requests</a>
+        <a href="{{ path('app_relatorio_hora_index') }}">Relatório de Horas</a>
+        <a href="{{ path('app_configuracao_relatorio_hora_index') }}">Configurações</a>
+    </nav>
+</header>
+<main class="page-wrap">
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="flash flash-{{ label }}">{{ message }}</div>
+        {% endfor %}
+    {% endfor %}
+    {% block body %}{% endblock %}
+</main>
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true" focusable="false">
+    <symbol id="icon-trash" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M9 3h6l1 2h4v2h-1v13a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7H4V5h4l1-2Zm8 4H7v13h10V7Zm-7 3h2v8h-2v-8Zm4 0h2v8h-2v-8Z"/>
+    </symbol>
+    <symbol id="icon-edit" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M3 17.25V21h3.75L18.81 8.94l-3.75-3.75L3 17.25Zm2.92 1.83H5v-.92l9.06-9.06.92.92L5.92 19.08ZM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.13 1.13 3.75 3.75 1.13-1.13Z"/>
+    </symbol>
+    <symbol id="icon-open" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M10 4l2 2h8a2 2 0 0 1 2 2v2H2V6a2 2 0 0 1 2-2h6Zm12 8v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6h20Zm-2 2H4v4h16v-4Z"/>
+    </symbol>
+    <symbol id="icon-download" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M11 3h2v9h3l-4 4-4-4h3V3ZM4 18h16v3H4v-3Z"/>
+    </symbol>
+</svg>
+<div id="fiori-modal-overlay" class="fiori-modal-overlay" hidden>
+    <div class="fiori-modal" role="dialog" aria-modal="true" aria-labelledby="fiori-modal-title">
+        <div class="fiori-modal-header">
+            <span class="fiori-modal-icon" aria-hidden="true">!</span>
+            <h3 id="fiori-modal-title" class="fiori-modal-title">Confirmação</h3>
+        </div>
+        <div id="fiori-modal-message" class="fiori-modal-message"></div>
+        <div class="fiori-modal-actions">
+            <button id="fiori-modal-confirm" type="button" class="btn">Confirmar</button>
+            <button id="fiori-modal-cancel" type="button" class="btn secondary">Cancelar</button>
+        </div>
+    </div>
+</div>
+<script>
+document.addEventListener('submit', function (event) {
+    var form = event.target;
+    if (!(form instanceof HTMLFormElement)) {
+        return;
+    }
+
+    if (form.dataset.confirmMessage && form.dataset.confirmed !== 'true') {
+        event.preventDefault();
+        if (typeof window.showFioriConfirm !== 'function') {
+            return;
+        }
+        window.showFioriConfirm({
+            title: form.dataset.confirmTitle || 'Confirmação',
+            message: form.dataset.confirmMessage,
+            confirmText: form.dataset.confirmConfirmText || 'Confirmar',
+            cancelText: form.dataset.confirmCancelText || 'Cancelar'
+        }).then(function (confirmar) {
+            if (!confirmar) {
+                return;
+            }
+            form.dataset.confirmed = 'true';
+            if (typeof form.requestSubmit === 'function') {
+                form.requestSubmit();
+            } else {
+                form.submit();
+            }
+        });
+        return;
+    }
+
+    if (form.dataset.allowMultiSubmit === 'true') {
+        return;
+    }
+
+    if (form.dataset.submitted === 'true') {
+        event.preventDefault();
+        return;
+    }
+
+    form.dataset.submitted = 'true';
+
+    var buttons = form.querySelectorAll('button[type="submit"], input[type="submit"]');
+    buttons.forEach(function (button) {
+        button.disabled = true;
+    });
+}, true);
+
+(function () {
+    var overlay = document.getElementById('fiori-modal-overlay');
+    var title = document.getElementById('fiori-modal-title');
+    var message = document.getElementById('fiori-modal-message');
+    var confirmButton = document.getElementById('fiori-modal-confirm');
+    var cancelButton = document.getElementById('fiori-modal-cancel');
+    if (!overlay || !title || !message || !confirmButton || !cancelButton) {
+        return;
+    }
+
+    var resolver = null;
+    var opener = null;
+
+    function closeModal(answer) {
+        overlay.hidden = true;
+        document.body.classList.remove('modal-open');
+        if (resolver) {
+            resolver(answer);
+        }
+        if (opener && typeof opener.focus === 'function') {
+            opener.focus();
+        }
+        resolver = null;
+        opener = null;
+    }
+
+    window.showFioriConfirm = function (options) {
+        options = options || {};
+        opener = document.activeElement;
+        title.textContent = options.title || 'Confirmação';
+        message.textContent = options.message || '';
+        confirmButton.textContent = options.confirmText || 'Confirmar';
+        cancelButton.textContent = options.cancelText || 'Cancelar';
+
+        overlay.hidden = false;
+        document.body.classList.add('modal-open');
+        confirmButton.focus();
+
+        return new Promise(function (resolve) {
+            resolver = resolve;
+        });
+    };
+
+    confirmButton.addEventListener('click', function () {
+        closeModal(true);
+    });
+    cancelButton.addEventListener('click', function () {
+        closeModal(false);
+    });
+    overlay.addEventListener('click', function (event) {
+        if (event.target === overlay) {
+            closeModal(false);
+        }
+    });
+    document.addEventListener('keydown', function (event) {
+        if (!overlay.hidden && event.key === 'Escape') {
+            closeModal(false);
+        }
+    });
+})();
+</script>
+</body>
+</html>

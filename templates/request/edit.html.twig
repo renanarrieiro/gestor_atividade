@@ -1,0 +1,24 @@
+﻿{% extends 'base.html.twig' %}
+
+{% block title %}Editar Request{% endblock %}
+
+{% block body %}
+<h1 class="page-title">Editar SAP Request {{ sapRequest.numero }}</h1>
+<div class="card">
+    {{ form_start(form) }}
+    <div class="grid-3">
+        <div>{{ form_row(form.tipo) }}</div>
+        <div>{{ form_row(form.numero) }}</div>
+        <div>{{ form_row(form.modulo) }}</div>
+        <div>{{ form_row(form.usuario) }}</div>
+        <div>{{ form_row(form.status) }}</div>
+        <div>{{ form_row(form.dataRequest) }}</div>
+    </div>
+    {{ form_row(form.descricao) }}
+    <div class="actions">
+        <button class="btn">Salvar Alterações</button>
+        <a class="btn secondary" href="{{ path('app_atividade_show', {id: sapRequest.atividade.id}) }}">Cancelar</a>
+    </div>
+    {{ form_end(form) }}
+</div>
+{% endblock %}

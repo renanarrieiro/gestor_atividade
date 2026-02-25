@@ -1,0 +1,116 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Relatório de Horas{% endblock %}
+
+{% block body %}
+<h1 class="page-title">Relatório de Horas</h1>
+
+<div class="card">
+    <h2 class="section-title">Filtro</h2>
+    <form method="get" class="filters filters-compact">
+        <div>
+            <label for="mes">Mês</label>
+            <select id="mes" name="mes">
+                {% for valorMes, nomeMes in meses %}
+                    <option value="{{ valorMes }}" {{ valorMes == mes ? 'selected' : '' }}>{{ nomeMes }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label for="ano">Ano</label>
+            <input id="ano" name="ano" type="number" min="2000" max="2100" value="{{ ano }}">
+        </div>
+        <div>
+            <button class="btn">Filtrar</button>
+        </div>
+        <div class="filters-export">
+            <a class="btn secondary" href="{{ path('app_relatorio_hora_exportar', {mes: mes, ano: ano}) }}">Baixar XLSX</a>
+        </div>
+    </form>
+</div>
+
+<div class="grid-2 mt-2">
+    <div class="card">
+        <h2 class="section-title">Novo registro diário</h2>
+        {{ form_start(form) }}
+            {{ form_row(form.data) }}
+            {{ form_row(form.horasTrabalhadas) }}
+            {{ form_row(form.comentarios) }}
+            <input type="hidden" name="confirmar_sobrescrever" id="confirmar_sobrescrever" value="0">
+            <div class="actions">
+                <button class="btn success">Salvar registro</button>
+            </div>
+        {{ form_end(form) }}
+    </div>
+
+    <div class="card">
+        <h2 class="section-title">Registros de {{ meses[mes] }} / {{ ano }}</h2>
+        <div class="simulacoes">
+            <div class="simulacao-item">
+                <span class="simulacao-label">Simulação de faturamento total do mês</span>
+                <strong class="simulacao-value">R$ {{ simulacaoFaturamentoTotal|number_format(2, ',', '.') }}</strong>
+                <small class="subtle">{{ diasUteis }} dias úteis x 8 horas x R$ {{ taxaHora|number_format(2, ',', '.') }}/hora ({{ horasPrevistasMes }} horas no mês)</small>
+            </div>
+            <div class="simulacao-item">
+                <span class="simulacao-label">Simulação de faturamento parcial</span>
+                <strong class="simulacao-value">R$ {{ simulacaoFaturamentoParcial|number_format(2, ',', '.') }}</strong>
+                <small class="subtle">{{ totalHoras }} horas registradas x R$ {{ taxaHora|number_format(2, ',', '.') }}/hora</small>
+            </div>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Horas</th>
+                    <th>Comentários</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for registro in registros %}
+                    <tr>
+                        <td>{{ registro.data|date('d/m/Y') }}</td>
+                        <td>{{ registro.horasTrabalhadas }}</td>
+                        <td>{{ registro.comentarios }}</td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="3">Nenhum registro para o período selecionado.</td></tr>
+                {% endfor %}
+                </tbody>
+                <tfoot>
+                <tr>
+                    <th>Total</th>
+                    <th>{{ totalHoras }}</th>
+                    <th></th>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% if solicitarSobrescrita %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var form = document.querySelector('form[name="registro_hora"]');
+    var campo = document.getElementById('confirmar_sobrescrever');
+    if (!form || !campo || typeof window.showFioriConfirm !== 'function') {
+        return;
+    }
+
+    window.showFioriConfirm({
+        title: 'Aviso',
+        message: 'Já existe um registro para esta data. Deseja sobrescrever o registro antigo?',
+        confirmText: 'Sobrescrever',
+        cancelText: 'Cancelar'
+    }).then(function (confirmar) {
+        if (!confirmar) {
+            return;
+        }
+        campo.value = '1';
+        form.submit();
+    });
+});
+</script>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,45 @@
+﻿{% extends 'base.html.twig' %}
+
+{% block title %}Projetos | Gestor ABAP{% endblock %}
+
+{% block body %}
+<h1 class="page-title">Projetos</h1>
+<div class="actions page-actions"><a class="btn" href="{{ path('app_projeto_new') }}">Novo Projeto</a></div>
+<div class="card">
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Nome</th><th>Criado em</th><th>Atividades</th><th>Ações</th></tr></thead>
+            <tbody>
+            {% for projeto in projetos %}
+                <tr>
+                    <td>{{ projeto.nome }}</td>
+                    <td>{{ projeto.criadoEm|date('d/m/Y H:i') }}</td>
+                    <td>{{ projeto.atividades|length }}</td>
+                    <td>
+                        <div class="actions">
+                            <a class="btn secondary icon-btn" title="Detalhes" aria-label="Detalhes" href="{{ path('app_projeto_show', {id: projeto.id}) }}">
+                                <svg class="icon" aria-hidden="true"><use href="#icon-open"></use></svg>
+                                <span class="sr-only">Detalhes</span>
+                            </a>
+                            <a class="btn secondary icon-btn" title="Editar" aria-label="Editar" href="{{ path('app_projeto_edit', {id: projeto.id}) }}">
+                                <svg class="icon" aria-hidden="true"><use href="#icon-edit"></use></svg>
+                                <span class="sr-only">Editar</span>
+                            </a>
+                            <form method="post" action="{{ path('app_projeto_delete', {id: projeto.id}) }}" data-confirm-title="Confirmação" data-confirm-message="Excluir projeto e todos os dados relacionados?" data-confirm-confirm-text="Excluir">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete_projeto_' ~ projeto.id) }}">
+                                <button class="btn danger icon-btn" type="submit" title="Excluir" aria-label="Excluir">
+                                    <svg class="icon" aria-hidden="true"><use href="#icon-trash"></use></svg>
+                                    <span class="sr-only">Excluir</span>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            {% else %}
+                <tr><td colspan="4">Sem projetos.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

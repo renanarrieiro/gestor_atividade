@@ -1,0 +1,53 @@
+﻿{% extends 'base.html.twig' %}
+
+{% block title %}Projeto {{ projeto.nome }}{% endblock %}
+
+{% block body %}
+<h1 class="page-title">Projeto {{ projeto.nome }}</h1>
+<div class="actions page-actions">
+    <a class="btn" href="{{ path('app_atividade_new', {projeto: projeto.id}) }}">Nova Atividade</a>
+    <a class="btn secondary" href="{{ path('app_projeto_edit', {id: projeto.id}) }}">Editar Projeto</a>
+    <form method="post" action="{{ path('app_projeto_delete', {id: projeto.id}) }}" data-confirm-title="Confirmação" data-confirm-message="Excluir projeto e todas as atividades/requests?" data-confirm-confirm-text="Excluir">
+        <input type="hidden" name="_token" value="{{ csrf_token('delete_projeto_' ~ projeto.id) }}">
+        <button class="btn danger" type="submit">Excluir Projeto</button>
+    </form>
+</div>
+<div class="card">
+    <h2 class="section-title">Atividades</h2>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>ID Externo</th><th>Descrição</th><th>Requests</th><th>Ações</th></tr></thead>
+            <tbody>
+            {% for atividade in projeto.atividades %}
+                <tr>
+                    <td><span class="badge">{{ atividade.idExterno }}</span></td>
+                    <td>{{ atividade.descricao }}</td>
+                    <td>{{ atividade.requests|length }}</td>
+                    <td>
+                        <div class="actions">
+                            <a class="btn secondary icon-btn" title="Abrir" aria-label="Abrir" href="{{ path('app_atividade_show', {id: atividade.id}) }}">
+                                <svg class="icon" aria-hidden="true"><use href="#icon-open"></use></svg>
+                                <span class="sr-only">Abrir</span>
+                            </a>
+                            <a class="btn secondary icon-btn" title="Editar" aria-label="Editar" href="{{ path('app_atividade_edit', {id: atividade.id}) }}">
+                                <svg class="icon" aria-hidden="true"><use href="#icon-edit"></use></svg>
+                                <span class="sr-only">Editar</span>
+                            </a>
+                            <form method="post" action="{{ path('app_atividade_delete', {id: atividade.id}) }}" data-confirm-title="Confirmação" data-confirm-message="Excluir atividade e dados relacionados?" data-confirm-confirm-text="Excluir">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete_atividade_' ~ atividade.id) }}">
+                                <button class="btn danger icon-btn" type="submit" title="Excluir" aria-label="Excluir">
+                                    <svg class="icon" aria-hidden="true"><use href="#icon-trash"></use></svg>
+                                    <span class="sr-only">Excluir</span>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            {% else %}
+                <tr><td colspan="4">Nenhuma atividade neste projeto.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

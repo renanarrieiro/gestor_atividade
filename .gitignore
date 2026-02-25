@@ -1,0 +1,39 @@
+### IDE / OS
+/.idea/
+/.vscode/
+*.swp
+*.swo
+Thumbs.db
+.DS_Store
+
+### Build / dependencies
+/vendor/
+/public/bundles/
+/var/
+/.phpunit.result.cache
+
+### Environment and secrets (never commit real credentials)
+.env
+/.env.local
+/.env.local.php
+/.env.*.local
+/.env.*.secret
+/config/secrets/*/*.decrypt.private.php
+/config/secrets/*/*.private.php
+/config/secrets/*/*.key
+*.pem
+*.key
+*.p12
+*.pfx
+
+### Local databases / dumps
+*.sqlite
+*.sqlite3
+*.db
+*.sql
+*.dump
+
+### Runtime uploads / exports
+/public/uploads/
+/uploads/
+

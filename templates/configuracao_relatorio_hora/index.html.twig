@@ -1,0 +1,82 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Configurações de Relatório{% endblock %}
+
+{% block body %}
+<h1 class="page-title">Configurações de Relatório</h1>
+
+<div class="card">
+    <h2 class="section-title">Mês de referência</h2>
+    <form method="get" class="filters filters-compact">
+        <div>
+            <label for="mes">Mês</label>
+            <select id="mes" name="mes">
+                {% for valorMes, nomeMes in meses %}
+                    <option value="{{ valorMes }}" {{ valorMes == mes ? 'selected' : '' }}>{{ nomeMes }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label for="ano">Ano</label>
+            <input id="ano" name="ano" type="number" min="2000" max="2100" value="{{ ano }}">
+        </div>
+        <div>
+            <button class="btn">Aplicar</button>
+        </div>
+    </form>
+</div>
+
+<div class="grid-2 mt-2">
+    <div class="card">
+        <h2 class="section-title">Taxa por hora ({{ meses[mes] }} / {{ ano }})</h2>
+        <form method="post">
+            <input type="hidden" name="acao" value="salvar_taxa">
+            <input type="hidden" name="_token" value="{{ csrf_token('salvar_taxa_hora') }}">
+            <label for="taxa_hora">Taxa (R$) por hora</label>
+            <input id="taxa_hora" name="taxa_hora" type="number" min="0" step="0.01" required value="{{ taxaHora|number_format(2, '.', '') }}">
+            <div class="actions">
+                <button class="btn success">Salvar taxa</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="card">
+        <h2 class="section-title">Feriados para ignorar no cálculo</h2>
+        <form method="post" class="feriados-form">
+            <input type="hidden" name="acao" value="adicionar_feriado">
+            <input type="hidden" name="_token" value="{{ csrf_token('adicionar_feriado_config') }}">
+            <div>
+                <label for="feriado_data">Data</label>
+                <input id="feriado_data" name="feriado_data" type="date" min="{{ primeiroDiaMes }}" max="{{ ultimoDiaMes }}" required>
+            </div>
+            <div>
+                <label for="feriado_descricao">Descrição</label>
+                <input id="feriado_descricao" name="feriado_descricao" type="text" maxlength="120" placeholder="Ex.: Carnaval">
+            </div>
+            <div>
+                <button type="submit" class="btn">Adicionar feriado</button>
+            </div>
+        </form>
+        <div class="feriados-lista">
+            {% if feriadosDoMes is empty %}
+                <p class="subtle">Nenhum feriado configurado para {{ meses[mes] }} / {{ ano }}.</p>
+            {% else %}
+                {% for feriado in feriadosDoMes %}
+                    <div class="feriado-item">
+                        <span>{{ feriado.data|date('d/m/Y') }}{% if feriado.descricao %} - {{ feriado.descricao }}{% endif %}</span>
+                        <form method="post" data-confirm-message="Deseja remover este feriado?" data-confirm-title="Aviso" data-confirm-confirm-text="Remover" data-confirm-cancel-text="Cancelar">
+                            <input type="hidden" name="acao" value="remover_feriado">
+                            <input type="hidden" name="feriado_id" value="{{ feriado.id }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('remover_feriado_config_' ~ feriado.id) }}">
+                            <button type="submit" class="btn danger icon-btn" title="Remover" aria-label="Remover">
+                                <svg class="icon" aria-hidden="true"><use href="#icon-trash"></use></svg>
+                                <span class="sr-only">Remover</span>
+                            </button>
+                        </form>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

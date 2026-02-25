@@ -1,0 +1,111 @@
+﻿{% extends 'base.html.twig' %}
+
+{% block title %}SAP Requests{% endblock %}
+
+{% block body %}
+<h1 class="page-title">Lista Global de SAP Requests</h1>
+<div class="card">
+    <form method="get">
+        <div class="filters">
+            <div>
+                <label>Projeto</label>
+                <select name="projeto">
+                    <option value="">Todos</option>
+                    {% for projeto in projetos %}
+                        <option value="{{ projeto.id }}" {{ filtros.projeto == projeto.id ? 'selected' : '' }}>{{ projeto.nome }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label>Atividade</label>
+                <select name="atividade">
+                    <option value="">Todas</option>
+                    {% for atividade in atividades %}
+                        <option value="{{ atividade.id }}" {{ filtros.atividade == atividade.id ? 'selected' : '' }}>
+                            {{ atividade.projeto.nome }} - {{ atividade.idExterno }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label>Tipo de Request</label>
+                <select name="tipo">
+                    <option value="">Todos</option>
+                    {% for tipo in tiposRequest %}
+                        <option value="{{ tipo }}" {{ filtros.tipo == tipo ? 'selected' : '' }}>{{ tipo }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div><label>Módulo</label><input name="modulo" value="{{ filtros.modulo }}"></div>
+            <div>
+                <label>Status</label>
+                <select name="status">
+                    <option value="">Todos</option>
+                    {% for status in statusRequest %}
+                        <option value="{{ status }}" {{ filtros.status == status ? 'selected' : '' }}>{{ status }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div><label>Número</label><input name="numero" value="{{ filtros.numero }}"></div>
+        </div>
+        <div class="actions">
+            <button class="btn">Filtrar</button>
+            <a class="btn secondary" href="{{ path('app_request_index') }}">Limpar</a>
+            <a class="btn secondary" href="{{ path('app_request_exportar', {
+                projeto: filtros.projeto,
+                atividade: filtros.atividade,
+                tipo: filtros.tipo,
+                modulo: filtros.modulo,
+                status: filtros.status,
+                numero: filtros.numero
+            }) }}">Baixar XLSX</a>
+        </div>
+    </form>
+</div>
+
+<div class="card">
+    <div class="table-wrap">
+        <table>
+            <thead>
+            <tr>
+                <th>Projeto</th><th>Atividade</th><th>Tipo</th><th>Número</th><th>Descrição</th><th>Módulo</th><th>Usuário</th><th>Status</th><th>Data</th><th>Ações</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for req in requests %}
+                <tr>
+                    <td>{{ req.atividade.projeto.nome }}</td>
+                    <td>
+                        <a href="{{ path('app_atividade_show', {id: req.atividade.id}) }}">{{ req.atividade.idExterno }}</a>
+                    </td>
+                    <td>{{ req.tipo }}</td>
+                    <td>{{ req.numero }}</td>
+                    <td>{{ req.descricao }}</td>
+                    <td>{{ req.modulo }}</td>
+                    <td>{{ req.usuario }}</td>
+                    <td><span class="badge">{{ req.status }}</span></td>
+                    <td>{{ req.dataRequest|date('d/m/Y') }}</td>
+                    <td>
+                        <div class="actions nowrap">
+                            <a class="btn secondary icon-btn" title="Editar" aria-label="Editar" href="{{ path('app_request_edit', {id: req.id}) }}">
+                                <svg class="icon" aria-hidden="true"><use href="#icon-edit"></use></svg>
+                                <span class="sr-only">Editar</span>
+                            </a>
+                            <form method="post" action="{{ path('app_request_delete', {id: req.id}) }}" data-confirm-title="Confirmação" data-confirm-message="Excluir request?" data-confirm-confirm-text="Excluir">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete_request_' ~ req.id) }}">
+                                <button class="btn danger icon-btn" type="submit" title="Excluir" aria-label="Excluir">
+                                    <svg class="icon" aria-hidden="true"><use href="#icon-trash"></use></svg>
+                                    <span class="sr-only">Excluir</span>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            {% else %}
+                <tr><td colspan="10">Nenhuma request encontrada.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

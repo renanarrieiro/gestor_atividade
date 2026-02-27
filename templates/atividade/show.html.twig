@@ -153,6 +153,46 @@
     </div>
 </div>
 
+<div class="card activity-section">
+    <h2 class="section-title">Testes</h2>
+    {{ form_start(formTeste, {attr: {enctype: 'multipart/form-data'}}) }}
+    {{ form_widget(formTeste.tipo) }}
+    {{ form_row(formTeste.arquivo) }}
+    <div class="actions"><button class="btn">Enviar</button></div>
+    {{ form_end(formTeste) }}
+
+    <div class="table-wrap section-table">
+        <table>
+            <thead><tr><th>Arquivo</th><th>Data</th><th>Ações</th></tr></thead>
+            <tbody>
+            {% for arq in atividade.arquivos|filter(a => a.tipo == 'TESTE') %}
+                <tr>
+                    <td>{{ arq.nomeOriginal }}</td>
+                    <td>{{ arq.criadoEm|date('d/m/Y H:i') }}</td>
+                    <td>
+                        <div class="actions nowrap">
+                            <a class="btn secondary icon-btn" title="Download" aria-label="Download" href="{{ path('app_arquivo_download', {id: arq.id}) }}">
+                                <svg class="icon" aria-hidden="true"><use href="#icon-download"></use></svg>
+                                <span class="sr-only">Download</span>
+                            </a>
+                            <form method="post" action="{{ path('app_atividade_arquivo_delete', {atividade: atividade.id, arquivo: arq.id}) }}" data-confirm-title="Confirmação" data-confirm-message="Excluir este anexo de teste?" data-confirm-confirm-text="Excluir">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete_arquivo_' ~ arq.id) }}">
+                                <button class="btn danger icon-btn" type="submit" title="Excluir" aria-label="Excluir">
+                                    <svg class="icon" aria-hidden="true"><use href="#icon-trash"></use></svg>
+                                    <span class="sr-only">Excluir</span>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            {% else %}
+                <tr><td colspan="3">Sem anexos de teste.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
 <div class="card section-anchor activity-section" id="comentarios">
     <h2 class="section-title">Comentários da Situação Atual</h2>
     {{ form_start(formComentario) }}

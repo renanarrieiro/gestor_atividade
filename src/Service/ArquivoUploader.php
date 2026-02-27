@@ -12,7 +12,12 @@ class ArquivoUploader
 
     public function upload(UploadedFile $file, string $tipo): string
     {
-        $diretorio = strtolower($tipo) === 'funcional' ? 'funcional' : 'tecnica';
+        $tipoNormalizado = strtolower($tipo);
+        $diretorio = match ($tipoNormalizado) {
+            'funcional' => 'funcional',
+            'teste' => 'teste',
+            default => 'tecnica',
+        };
         $destino = rtrim($this->baseDir, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.$diretorio;
 
         if (!is_dir($destino) && !mkdir($destino, 0775, true) && !is_dir($destino)) {

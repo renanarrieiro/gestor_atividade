@@ -128,12 +128,19 @@ class AtividadeController extends AbstractController
             'action' => $this->generateUrl('app_atividade_upload', ['id' => $atividade->getId(), 'tipo' => 'FUNCIONAL']),
         ]);
 
+        $arquivoTeste = new \App\Entity\ArquivoAtividade();
+        $arquivoTeste->setTipo(\App\Entity\ArquivoAtividade::TIPO_TESTE);
+        $formTeste = $this->createForm(ArquivoAtividadeType::class, $arquivoTeste, [
+            'action' => $this->generateUrl('app_atividade_upload', ['id' => $atividade->getId(), 'tipo' => 'TESTE']),
+        ]);
+
         return $this->render('atividade/show.html.twig', [
             'atividade' => $atividade,
             'formRequest' => $formRequest,
             'formComentario' => $formComentario,
             'formTecnica' => $formTecnica,
             'formFuncional' => $formFuncional,
+            'formTeste' => $formTeste,
         ]);
     }
 

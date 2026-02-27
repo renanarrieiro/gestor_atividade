@@ -37,3 +37,7 @@ Thumbs.db
 /public/uploads/
 /uploads/
 
+### Local backups (keep docs/scripts only)
+/backups/*
+!/backups/README.md
+!/backups/backup_mysql.ps1

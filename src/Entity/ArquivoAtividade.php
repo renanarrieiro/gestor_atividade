@@ -10,6 +10,7 @@ class ArquivoAtividade
 {
     public const TIPO_TECNICA = 'TECNICA';
     public const TIPO_FUNCIONAL = 'FUNCIONAL';
+    public const TIPO_TESTE = 'TESTE';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
